@@ -1,0 +1,58 @@
+<div class="example">
+  <h1>Svelte Component Demo</h1>
+  <p class="example__selected">
+    {selected.length ? selected : 'nothing'} was selected
+  </p>
+  <Search
+    data="{data}"
+    search="{selected}"
+    on:select="setSearch(event)"
+  ></Search>
+</div>
+
+<script>
+  import Search from './components/search.html';
+  import { testData as data } from './data.js';
+
+  export default {
+    components: {
+      Search
+    },
+    data() {
+      return {
+        data,
+        selected: ''
+      };
+    },
+    methods: {
+      setSearch(event) {
+        this.set({ selected: event.text });
+      }
+    }
+  };
+</script>
+
+<style>
+  h1 {
+    margin: 0 auto;
+    padding: 40px 0;
+    text-align: center;
+    font-weight: 900;
+    font-size: 40px;
+    color: white;
+    text-shadow: 2px 3px 0px #845ec2;
+  }
+
+  .example {
+    margin: 0 auto;
+    width: 500px;
+    max-width: 90vw;
+  }
+
+  .example__selected {
+    text-align: center;
+    color: #845ec2;
+    font-size: 20px;
+    font-weight: 900;
+  }
+</style>

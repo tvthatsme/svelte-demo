@@ -1,0 +1,125 @@
+<div class="search" ref:search>
+  <input
+    class="search__input"
+    type="text"
+    bind:value="search"
+    on:focus="openDropdown()"
+    placeholder="Select a fruit"
+  />
+  {#if showResults}
+  <div class="search__dropdown">
+    {#each searchResults as {label} }
+    <div on:click="selectItem(label)" class="search__item">{label}</div>
+    {/each}
+  </div>
+  {/if}
+</div>
+
+<script>
+  export default {
+    data() {
+      return {
+        search: '',
+        showResults: false
+      };
+    },
+
+    methods: {
+      /**
+       * Open the dropdown section of the search
+       */
+      openDropdown() {
+        this.set({ showResults: true });
+      },
+
+      /**
+       * Select an item from the dropdown and set the event up
+       */
+      selectItem(text) {
+        this.set({ search: text, showResults: false });
+        this.fire('select', { text });
+      }
+    },
+
+    computed: {
+      /**
+       * Filter the list of results based on the search input
+       */
+      searchResults: ({ data, search }) => {
+        return data.filter(item =>
+          item.label.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+    },
+
+    /**
+     * Run when the componenthas been rendered to the DOM
+     */
+    oncreate() {
+      this.handleClick = event => {
+        // Close the dropdown if the click was outside the component area
+        if (!event.path.includes(this.refs.search)) {
+          this.set({ showResults: false });
+        }
+      };
+
+      // Add an event listener to the window to detect all clicks
+      this.__clickAwayListener__ = window.addEventListener(
+        'click',
+        this.handleClick
+      );
+    },
+
+    /**
+     * Run when the component is removed from the DOM
+     */
+    ondestroy() {
+      window.removeEventListener(this.__clickAwayListener__);
+    }
+  };
+</script>
+
+<style>
+  .search {
+    position: relative;
+    width: 100%;
+    border: 2px solid #845ec2;
+    border-radius: 3px;
+    height: 44px;
+  }
+
+  .search__input {
+    width: 100%;
+    border: none;
+    height: 40px;
+    padding: 0 8px;
+    font-size: 18px;
+    color: #333;
+  }
+
+  .search__input:focus {
+    outline: none;
+  }
+
+  .search__dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: -2px;
+    right: -2px;
+    background-color: white;
+    border: 2px solid #845ec2;
+    border-radius: 3px;
+    padding: 16px 8px;
+    max-height: 50vh;
+    overflow: scroll;
+  }
+
+  .search__item {
+    padding: 4px 0;
+    font-size: 18px;
+  }
+
+  .search__item:hover {
+    cursor: pointer;
+  }
+</style>
